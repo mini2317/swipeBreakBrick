@@ -86,6 +86,8 @@ class Bullet(Sprite):
                                 self.direction = math.pi - self.direction
                             case 4:
                                 self.direction += math.pi
+                                self.x += dx
+                                self.y += dy
                         if rst:
                             dx = math.cos(self.direction) * self.speed
                             dy = math.sin(self.direction) * self.speed

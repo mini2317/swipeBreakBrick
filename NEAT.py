@@ -179,7 +179,7 @@ class Topology:
             for edge in self.edges:
                 if self.nodes[edge.end].layer == targetLayer and not edge.disAbled:
                     if self.nodes[edge.start].layer != 0:
-                        values[edge.end] += ELU(values[edge.start] * edge.weight)
+                        values[edge.end] += math.tanh(values[edge.start] * edge.weight)
                     else:
                         values[edge.end] += values[edge.start] * edge.weight
         return [values[i] for i in range(self.inNodeNum , self.inNodeNum + self.outNodeNum)]
@@ -407,5 +407,5 @@ def NEAT(generation,file = False,printMod = False,preGene = None):
             openFile.write(json.dumps(data,indent=4))
             openFile.close()
 if __name__ == '__main__':
-    preGene = [Edge(18,43,1,0,True), Edge(22,45,0.5763876663195122,388,False), Edge(47,43,0.5003362333044425,520,False), Edge(48,44,0.22893340373369808,522,True), Edge(45,43,0.35331247444047365,401,False), Edge(51,44,0.19667073819482894,658,False), Edge(46,43,-0.409855192703517,412,True), Edge(49,44,0.9322269313968934,541,False), Edge(44,43,0.5581277773386084,160,True), Edge(46,43,-0.6264131929218959,423,False), Edge(32,44,-0.965653190871629,551,True), Edge(45,47,-0.9275188860369654,552,False), Edge(4,47,0.021212703451514603,554,True), Edge(3,44,-0.6498194720342261,427,False), Edge(13,43,-0.39189338436789245,430,False), Edge(15,47,0.8822822032234725,568,True), Edge(52,44,-0.02708780243655662,702,True), Edge(42,44,-0.9146727964501404,451,False), Edge(6,43,-0.37943490626498155,452,False), Edge(44,43,-0.27397489898011496,73,True), Edge(23,44,0.2840120548223828,464,False), Edge(45,44,0.22893340373369808,350,True), Edge(1,43,0.44452606368743175,354,True), Edge(38,43,-0.5155857758623601,483,False), Edge(50,44,-0.1235970374370623,612,True), Edge(48,47,-0.7060799401805973,633,True), Edge(53,43,-0.5091250243900842,762,False), Edge(47,44,0.7903263978226183,510,True), Edge(49,48,1.0,710,False), Edge(53,48,0.10454601694767107,939,True), Edge(54,43,-0.6081534072815526,852,False), Edge(55,48,0.10454601694767107,951,False), Edge(38,47,-0.7862273546436933,697,True), Edge(15,56,1.0,1028,False), Edge(56,47,0.8822822032234725,1028,False)]
-    NEAT(100,True,printMod=True,preGene=preGene)
+    preGene = [Edge(10,43,1,0,True), Edge(45,43,0.281474379407912,320,True), Edge(25,44,0.31348075752476046,322,True), Edge(44,43,-0.8459073273060027,70,True), Edge(44,43,1,199,False), Edge(46,43,0.7685685187134161,394,True), Edge(32,43,0.39268373828408487,396,True), Edge(44,43,0.7850879167949227,13,False), Edge(28,43,-0.5475180495352123,302,True), Edge(45,43,0.281474379407912,399,False), Edge(27,43,-0.9445169794428316,364,False), Edge(44,43,0.9874571888311285,241,True), Edge(13,44,-0.9092497395234733,307,False), Edge(28,44,-0.3089522963692155,343,False), Edge(44,43,0.2905139381651991,88,False), Edge(22,45,-0.5676178283239404,413,False), Edge(25,43,0.8003245490989297,318,True), Edge(7,43,0.04697766191345032,383,False), Edge(13,43,0.8900784193689129,420,False), Edge(22,44,0.5359946794582107,436,False), Edge(47,43,0.7685685187134161,406,False), Edge(46,43,-0.8077736831704678,404,True), Edge(42,44,-0.804591265741115,361,False), Edge(45,43,1,334,False), Edge(46,48,1.0,447,False), Edge(48,43,-0.8077736831704678,447,False)]
+    NEAT(1000,True,printMod=True,preGene=preGene)

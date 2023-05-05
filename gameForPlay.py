@@ -97,12 +97,15 @@ if __name__ == "__main__":
                     playerPos = moveToPos
                     comeBackBall = 0
                     nowShooting = False
-                    ballNumber += addBall + sum(map(lambda x : type(x) == Item,boxes[-1]))
+                    ballNumber += addBall
                     addBall = 0
                     nowRound += 1
                     if makeNewLine(boxes,nowRound) == GAME_OVER:
                         print("YOU DIE")
                         sys.exit()
+                    if sum(map(lambda x : type(x) == Item,boxes[-1])):
+                        ballNumber += 1
+                        boxes[-1] = [None]*WIDTH
                 popped += 1
             bullet.draw(screen)
         drawBox(screen,boxes)

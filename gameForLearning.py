@@ -3,7 +3,7 @@ import random
 from parameters import *
 from sprite import *
 
-def forward(boxes,playerPos,ballNumber,nowRound,nn):
+def forward(boxes,playerPos,nn):
     def check(n):
         if type(n) == Box:
             return 0.05*n.hp
@@ -11,7 +11,7 @@ def forward(boxes,playerPos,ballNumber,nowRound,nn):
             return 0.9
         else:
             return 0
-    x = (*list(map(check,sum(boxes,[]))),playerPos/SCREEN_WIDTH,nowRound*0.01,ballNumber*0.01)
+    x = (*list(map(check,sum(boxes,[]))),playerPos/SCREEN_WIDTH)
     #x = (*list(map(check,boxes)),playerPos/SCREEN_WIDTH,nowRound*0.05,ballNumber*0.05)
     return nn.forward(*x)
 
@@ -66,8 +66,9 @@ def get_fitness(networks,seed):
                 network = networks[nowIdx//EXPAND]
                 if (not nowShooting[nowIdx]):
                     #print(network.edges)
-                    forwardResult = forward(boxes[nowIdx],playerPos[nowIdx],ballNumber[nowIdx],nowRound[nowIdx],network)
-                    theta[nowIdx] = min(max(-forwardResult[0]*math.pi,-math.pi*(180-DEGREE_LIMIT)/180),-math.pi*DEGREE_LIMIT/180)
+                    #forwardResult = forward(boxes[nowIdx],playerPos[nowIdx],ballNumber[nowIdx],nowRound[nowIdx],network)
+                    forwardResult = forward(boxes[nowIdx],playerPos[nowIdx],network)
+                    theta[nowIdx] = min(max(-forwardResult[0]*math.pi-math.pi/2,-math.pi*(180-DEGREE_LIMIT)/180),-math.pi*DEGREE_LIMIT/180)
                     bullets[nowIdx].append(Bullet(playerPos[nowIdx],theta[nowIdx]))
                     delay[nowIdx] = 10
                     nowShooting[nowIdx] = True
@@ -103,7 +104,7 @@ def get_fitness(networks,seed):
                             comeBackBall[nowIdx] = 0
                             playerPos[nowIdx] = moveToPos[nowIdx]
                             nowShooting[nowIdx] = False
-                            ballNumber[nowIdx] += addBall[nowIdx] + sum(map(lambda x : type(x) == Item,boxes[nowIdx][-1]))
+                            ballNumber[nowIdx] += addBall[nowIdx]
                             addBall[nowIdx] = 0
                             nowRound[nowIdx] += 1
                             #print("DROP!")
@@ -111,6 +112,9 @@ def get_fitness(networks,seed):
                                 end[nowIdx] = True
                             if nowRound[nowIdx] == 50:
                                 end[nowIdx] = True
+                            if sum(map(lambda x : type(x) == Item,boxes[nowIdx][-1])):
+                                ballNumber[nowIdx] += 1
+                                boxes[nowIdx][-1] = [None]*WIDTH
                         popped += 1
         if all(end):break
         roll += 1

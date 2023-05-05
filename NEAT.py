@@ -1,7 +1,6 @@
-import random,copy,pickle,datetime,json
+import random,copy,pickle,datetime,json,math
 from parameters import *
 from gameForLearning import *
-import numpy as np
 
 def rouletteWheel(fitness, bestNum):
     selected_individuals = []
@@ -171,6 +170,8 @@ class Topology:
                 values[nodeId] = inputValue[nodeId]
         def ReLU(x):
             return max(x,0)
+        def ELU(x):
+            return x if x >= 0 else 0.5*(math.e**x-1)
         for nowLayer in range(self.maxLayer + 1):
             targetLayer = nowLayer + 1
             if nowLayer == self.maxLayer:
@@ -178,7 +179,7 @@ class Topology:
             for edge in self.edges:
                 if self.nodes[edge.end].layer == targetLayer and not edge.disAbled:
                     if self.nodes[edge.start].layer != 0:
-                        values[edge.end] += ReLU(values[edge.start] * edge.weight)
+                        values[edge.end] += ELU(values[edge.start] * edge.weight)
                     else:
                         values[edge.end] += values[edge.start] * edge.weight
         return [values[i] for i in range(self.inNodeNum , self.inNodeNum + self.outNodeNum)]
@@ -228,7 +229,7 @@ class Topology:
         while (end.layer <= start.layer and end.layer != -1) or (end.nodeId in connectedZone):
             connectedZone = list(map(lambda x: x.end ,self.nodes[start.nodeId].next))
             end = self.nodes[random.choice(list(self.nodes.keys()))]
-        weight = random.random()
+        weight = 2*random.random() - 1
         #print(f'newEdge({innovNum}) : {start.nodeId} -> {end.nodeId}[{weight}]')
         self.edges.append(Edge(start.nodeId,end.nodeId,weight,innovNum))
         self.init(*self.edges)
@@ -269,7 +270,7 @@ class Topology:
         while edge.disAbled:
             edgeNum = random.randint(0,len(self.edges)-1)
             edge = self.edges[edgeNum]
-        newValue = random.random()
+        newValue = (random.random() - 0.5)*2
         self.edges[edgeNum].weight = newValue
         for i in range(len(self.nodes[edge.start].next)):
             if self.nodes[edge.start].next[i].end == edge.end:
@@ -293,9 +294,9 @@ class Topology:
         while edge.disAbled:
             edgeNum = random.randint(0,len(self.edges)-1)
             edge = self.edges[edgeNum]
-        newValue = (random.random() - 0.5)/2
+        newValue = (random.random() - 0.5)*2
         temp = self.edges[edgeNum].weight
-        self.edges[edgeNum].weight = min(1,max(0,temp + newValue))
+        self.edges[edgeNum].weight = min(1,max(-1,temp + newValue))
         for i in range(len(self.nodes[edge.start].next)):
             if self.nodes[edge.start].next[i].end == edge.end:
                 self.nodes[edge.start].next[i].weight = newValue
@@ -339,13 +340,13 @@ def oneCycle(networks,generation = 0,seed = None,printMod = False):
         new[-1].fitness = 0
     for i in range(len(new)):
         choice = random.random() * 100
-        if choice >= 70:
+        if choice >= 60:
             new[i].setWeightMutation()
-        elif choice >= 30:
-            new[i].addWeightMutation()
         elif choice >= 20:
-            new[i].addEdgeMutation()
+            new[i].addWeightMutation()
         elif choice >= 10:
+            new[i].addEdgeMutation()
+        elif choice >= 0:
             if len(new[i].edges) != 0:
                 new[i].addNodeMutation()
             else:
@@ -406,5 +407,5 @@ def NEAT(generation,file = False,printMod = False,preGene = None):
             openFile.write(json.dumps(data,indent=4))
             openFile.close()
 if __name__ == '__main__':
-    preGene = [Edge(12,45,1,0,True), Edge(25,45,-0.10084413947134768,388,True), Edge(50,45,0.004829785489902649,516,False), Edge(26,46,0.7519728585233219,774,False), Edge(16,46,0.8233622467984375,519,True), Edge(4,46,0.19848729963159006,521,False), Edge(47,46,0.12382277563693733,394,True), Edge(36,45,-0.22815375420747314,396,True), Edge(48,46,0.1225907495946274,397,True), Edge(51,46,0.09929478929939783,525,False), Edge(42,45,0.9848197899069386,654,False), Edge(52,46,-0.04730955294869604,661,False), Edge(34,46,0.42118377866379464,541,False), Edge(46,45,0.17220718508376026,289,True), Edge(46,45,0.003456130669623303,34,True), Edge(13,45,0.9673421756107188,422,False), Edge(40,45,0.07168995492916619,686,False), Edge(8,46,0.23011892426552483,431,True), Edge(34,45,0.16945022942408022,433,True), Edge(50,46,-0.054523227601924296,565,False), Edge(48,46,0.1809739171480403,438,False), Edge(46,45,0.4647593280246909,58,True), Edge(33,45,-0.2446083338806434,442,False), Edge(53,45,-0.18538520232577077,699,False), Edge(46,45,1,190,True), Edge(49,46,-0.09355469634850233,447,False), Edge(39,46,-0.19024029276604815,574,False), Edge(48,47,0.013896424918986683,451,False), Edge(4,46,-0.11110465150189625,326,True), Edge(49,45,1,455,True), Edge(6,45,0.8109795585447496,330,False), Edge(47,46,0,337,True), Edge(4,45,0.42604959639188145,595,False), Edge(51,46,0.09929478929939783,598,False), Edge(28,46,-0.2449165317370987,345,False), Edge(46,45,0.7587539553139004,91,False), Edge(23,45,0.9036452010194657,375,False), Edge(1,46,0.6729117551940613,352,True), Edge(11,45,0.08535179906286494,484,True), Edge(6,45,0.4693894345725963,362,True), Edge(49,45,0.08535179906286494,491,True), Edge(47,46,0.12382277563693733,365,False), Edge(47,45,-0.013040691271270277,371,True), Edge(21,45,0.1003283354982874,503,False), Edge(50,45,-0.18538520232577077,504,True), Edge(54,46,0.36244359209383614,761,False)]
+    preGene = [Edge(18,43,1,0,True), Edge(22,45,0.5763876663195122,388,False), Edge(47,43,0.5003362333044425,520,False), Edge(48,44,0.22893340373369808,522,True), Edge(45,43,0.35331247444047365,401,False), Edge(51,44,0.19667073819482894,658,False), Edge(46,43,-0.409855192703517,412,True), Edge(49,44,0.9322269313968934,541,False), Edge(44,43,0.5581277773386084,160,True), Edge(46,43,-0.6264131929218959,423,False), Edge(32,44,-0.965653190871629,551,True), Edge(45,47,-0.9275188860369654,552,False), Edge(4,47,0.021212703451514603,554,True), Edge(3,44,-0.6498194720342261,427,False), Edge(13,43,-0.39189338436789245,430,False), Edge(15,47,0.8822822032234725,568,True), Edge(52,44,-0.02708780243655662,702,True), Edge(42,44,-0.9146727964501404,451,False), Edge(6,43,-0.37943490626498155,452,False), Edge(44,43,-0.27397489898011496,73,True), Edge(23,44,0.2840120548223828,464,False), Edge(45,44,0.22893340373369808,350,True), Edge(1,43,0.44452606368743175,354,True), Edge(38,43,-0.5155857758623601,483,False), Edge(50,44,-0.1235970374370623,612,True), Edge(48,47,-0.7060799401805973,633,True), Edge(53,43,-0.5091250243900842,762,False), Edge(47,44,0.7903263978226183,510,True), Edge(49,48,1.0,710,False), Edge(53,48,0.10454601694767107,939,True), Edge(54,43,-0.6081534072815526,852,False), Edge(55,48,0.10454601694767107,951,False), Edge(38,47,-0.7862273546436933,697,True), Edge(15,56,1.0,1028,False), Edge(56,47,0.8822822032234725,1028,False)]
     NEAT(100,True,printMod=True,preGene=preGene)

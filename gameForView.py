@@ -12,7 +12,7 @@ if __name__ == "__main__":
                 return 0.9
             else:
                 return 0
-        x = (*list(map(check,sum(boxes,[]))),playerPos/SCREEN_WIDTH,nowRound*0.05,ballNumber*0.05)
+        x = (*list(map(check,sum(boxes,[]))),playerPos/SCREEN_WIDTH,nowRound*0.01,ballNumber*0.01)
         #x = (*list(map(check,boxes)),playerPos/SCREEN_WIDTH,nowRound*0.05,ballNumber*0.05)
         return nn.forward(*x)
     pygame.init()

@@ -14,7 +14,7 @@ if __name__ == "__main__":
                 return 0
         x = (*list(map(check,sum(boxes,[]))),playerPos/SCREEN_WIDTH)
         #x = (*list(map(check,boxes)),playerPos/SCREEN_WIDTH,nowRound*0.05,ballNumber*0.05)
-        return nn.forward(*x)
+        return math.tanh(nn.forward(*x)[0])
     pygame.init()
     pygame.display.set_caption("SwipeBrickBreak")
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -70,7 +70,7 @@ if __name__ == "__main__":
                     boxes[y][x].draw(screen,(x,y))
     makeNewLine(boxes,1,seed)
     while True:
-        #clock.tick(FPS)
+        clock.tick(FPS)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 sys.exit()
@@ -79,14 +79,14 @@ if __name__ == "__main__":
         Bullet(moveToPos,math.pi/2).draw(screen)
         #forwardResult = forward(boxes,playerPos,ballNumber,nowRound,nn)
         forwardResult = forward(boxes,playerPos,nn)
-        showTheta = max(min(math.pi-forwardResult[0]*math.pi,math.pi*(180-DEGREE_LIMIT)/180),math.pi*DEGREE_LIMIT/180)
+        showTheta = math.radians(180-forwardResult*(180-2*DEGREE_LIMIT)-DEGREE_LIMIT)
         pygame.draw.line(screen,BLUE,(int(moveToPos),int(startPos)),(int(moveToPos) - math.cos(showTheta)*50, int(startPos) - math.sin(showTheta)*50))
         network = nn
         if (not nowShooting):
             #print(network.edges)
             #forwardResult = forward(boxes,playerPos,ballNumber,nowRound,network)
             forwardResult = forward(boxes,playerPos,network)
-            theta = min(max(-forwardResult[0]*math.pi,-math.pi*(180-DEGREE_LIMIT)/180),-math.pi*DEGREE_LIMIT/180)
+            theta = -math.radians(forwardResult*(180-2*DEGREE_LIMIT)+DEGREE_LIMIT)
             bullets.append(Bullet(playerPos,theta))
             delay = 10
             nowShooting = True

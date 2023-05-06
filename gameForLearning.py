@@ -13,7 +13,7 @@ def forward(boxes,playerPos,nn):
             return 0
     x = (*list(map(check,sum(boxes,[]))),playerPos/SCREEN_WIDTH)
     #x = (*list(map(check,boxes)),playerPos/SCREEN_WIDTH,nowRound*0.05,ballNumber*0.05)
-    return nn.forward(*x)
+    return math.tanh(nn.forward(*x)[0])
 
 def get_fitness(networks,seed):
     expandedObjectNum = EXPAND * OBJECT_NUM
@@ -68,7 +68,7 @@ def get_fitness(networks,seed):
                     #print(network.edges)
                     #forwardResult = forward(boxes[nowIdx],playerPos[nowIdx],ballNumber[nowIdx],nowRound[nowIdx],network)
                     forwardResult = forward(boxes[nowIdx],playerPos[nowIdx],network)
-                    theta[nowIdx] = min(max(-forwardResult[0]*math.pi-math.pi/2,-math.pi*(180-DEGREE_LIMIT)/180),-math.pi*DEGREE_LIMIT/180)
+                    theta[nowIdx] = -math.radians(forwardResult*(180-2*DEGREE_LIMIT)+DEGREE_LIMIT)
                     bullets[nowIdx].append(Bullet(playerPos[nowIdx],theta[nowIdx]))
                     delay[nowIdx] = 10
                     nowShooting[nowIdx] = True

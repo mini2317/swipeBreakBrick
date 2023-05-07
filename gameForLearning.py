@@ -31,7 +31,7 @@ def get_fitness(networks,seed):
     theta = [0 for i in range(expandedObjectNum)]
     score = [0 for i in range(expandedObjectNum)]
     end = [False for i in range(expandedObjectNum)]
-    moveToPos = [0 for i in range(expandedObjectNum)]
+    moveToPos = [playerPos for i in range(expandedObjectNum)]
 
     def makeNewLine(boxes,nowRound,nowIdx):
         nowSeed = seed[nowIdx%EXPAND]
@@ -68,7 +68,7 @@ def get_fitness(networks,seed):
                     #print(network.edges)
                     #forwardResult = forward(boxes[nowIdx],playerPos[nowIdx],ballNumber[nowIdx],nowRound[nowIdx],network)
                     forwardResult = forward(boxes[nowIdx],playerPos[nowIdx],network)
-                    theta[nowIdx] = -math.radians(forwardResult*(180-2*DEGREE_LIMIT)+DEGREE_LIMIT)
+                    theta[nowIdx] = -math.radians(forwardResult*(90-DEGREE_LIMIT)+90)
                     bullets[nowIdx].append(Bullet(playerPos[nowIdx],theta[nowIdx]))
                     delay[nowIdx] = 10
                     nowShooting[nowIdx] = True
